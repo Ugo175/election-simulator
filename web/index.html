@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Explore how the same ranked ballots can produce different election outcomes. Compare plurality and instant-runoff, one round at a time.">
+  <title>Ballot Lab — Every preference tells a story</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#workspace">Skip to election workspace</a>
+  <header class="site-header">
+    <a class="brand" href="/" aria-label="Ballot Lab home"><span class="brand-mark" aria-hidden="true">✓</span>ballot<span class="brand-light">lab</span><span class="edition">AN INTERACTIVE ELECTION LAB</span></a>
+    <a href="#how-it-works" class="header-link">How it works <span aria-hidden="true">↗</span></a>
+  </header>
+  <main>
+    <section class="intro" aria-labelledby="page-title">
+      <div>
+        <div class="eyebrow"><span class="small-line"></span> A LITTLE EXPERIMENT IN DEMOCRACY</div>
+        <h1 id="page-title">Same ballots.<br><span>Different outcomes.</span></h1>
+        <p class="intro-copy">The way we count changes who wins. Build an election,<br class="desktop-break"> compare two methods, and follow every preference.</p>
+      </div>
+      <div class="intro-note"><span class="note-number">01 / 02</span><p>One election.<br>Two ways to count.<br><em>You get to see why.</em></p><span class="note-arrow" aria-hidden="true">↙</span></div>
+    </section>
+
+    <div class="workspace-top" id="workspace"><h2>Your election workspace</h2><span class="local-status"><span></span> Runs locally · No account needed</span></div>
+    <div class="workspace">
+      <aside class="setup" aria-label="Election setup">
+        <section class="panel setup-panel">
+          <div class="section-heading"><span class="step">01</span><h3>Set the stage</h3></div>
+          <label class="field-label" for="example">Start with an example</label>
+          <select id="example"><option value="custom" disabled hidden>Custom election</option><option value="different">A different winner</option><option value="majority">A clear majority</option><option value="exhausted">When ballots run out</option><option value="tie">An elimination tie</option></select>
+          <div class="field-row"><label class="field-label" for="candidates">Candidates</label><span id="candidate-count" class="muted">3 candidates</span></div>
+          <div id="candidate-chips" class="chips" aria-label="Current candidates"></div>
+          <details class="candidate-editor"><summary>Edit candidates</summary><label class="field-label" for="candidates">One candidate per line</label><textarea id="candidates" rows="3" maxlength="1300">Ada
+Grace
+Linus</textarea><p class="field-help">Applying a new list clears the current ballots.</p><button class="button small secondary" type="button" id="apply-candidates">Apply candidates</button></details>
+        </section>
+
+        <section class="panel setup-panel ballot-panel">
+          <div class="section-heading"><span class="step">02</span><h3>Build your ballots</h3></div>
+          <div class="tabs" role="tablist" aria-label="Ballot entry method"><button type="button" id="guided-tab" role="tab" aria-selected="true" aria-controls="guided-panel">Rank choices</button><button type="button" id="csv-tab" role="tab" aria-selected="false" aria-controls="csv-panel" tabindex="-1">Import CSV</button></div>
+          <div id="guided-panel" role="tabpanel" aria-labelledby="guided-tab">
+            <p class="field-help">Rank from favorite to least favorite. You can leave later choices blank.</p>
+            <div id="rank-fields" class="rank-fields"></div>
+            <div class="add-row"><div><label class="field-label" for="copies">Number of voters</label><input id="copies" type="number" min="1" max="10000" value="1"></div><button class="button secondary" type="button" id="add-ballot">+ Add ballot</button></div>
+          </div>
+          <div id="csv-panel" role="tabpanel" aria-labelledby="csv-tab" hidden>
+            <label class="field-label" for="csv">One ranked ballot per row, without a header</label><textarea id="csv" rows="7" spellcheck="false" placeholder="Ada,Grace,Linus&#10;Grace,Linus,Ada"></textarea>
+            <div class="csv-actions"><label for="upload" class="button small secondary upload-label">Choose .csv file<input id="upload" type="file" accept=".csv,text/csv"></label><button type="button" class="text-button" id="apply-csv">Apply CSV →</button></div>
+            <p class="field-help">Applying CSV replaces the ballot box. Names must match the candidates above.</p>
+          </div>
+          <div class="ballot-box-head"><h4>The ballot box <span id="ballot-count">9</span></h4><button class="text-button" type="button" id="clear-ballots">Clear</button></div>
+          <div id="ballot-list" class="ballot-list" aria-label="Ballot groups"></div>
+          <div class="setup-error" id="setup-error" role="alert" hidden></div>
+          <button class="button primary run-button" type="button" id="run">Compare outcomes <span aria-hidden="true">↗</span></button>
+          <p class="local-caption">Your ballots stay on this computer.</p>
+        </section>
+      </aside>
+
+      <section class="results" aria-label="Election results" aria-busy="false">
+        <div class="results-heading"><div class="eyebrow">THE COMPARISON</div><button class="text-button export-button" type="button" id="export" disabled>Export results <span aria-hidden="true">↓</span></button></div>
+        <div id="stale" class="stale-notice" role="status" hidden>Ballots changed. Compare outcomes to update these results.</div>
+        <div id="results-content">
+          <div class="outcome-grid">
+            <article class="panel outcome-card plurality-card"><div class="method-label"><span>METHOD 01</span><span class="method-icon" aria-hidden="true">Ⅰ</span></div><h3>Plurality</h3><p class="method-description">The most first-choice votes wins.</p><div class="winner-row"><div><span class="winner-label" id="plurality-label">LEADING CANDIDATE</span><h4 class="winner-name" id="plurality-winner">—</h4></div><span class="winner-stat" id="plurality-stat">—</span></div><div class="mini-bars" id="plurality-bars"></div><p class="outcome-foot" id="plurality-foot">Run a comparison to see results.</p></article>
+            <article class="panel outcome-card runoff-card"><div class="method-label"><span>METHOD 02</span><span class="method-icon" aria-hidden="true">Ⅱ</span></div><h3>Instant-runoff</h3><p class="method-description">Ranked choices. A majority to win.</p><div class="winner-row"><div><span class="winner-label" id="runoff-label">WINNING CANDIDATE</span><h4 class="winner-name" id="runoff-winner">—</h4></div><span class="winner-stat" id="runoff-stat">—</span></div><div class="mini-bars" id="runoff-bars"></div><p class="outcome-foot" id="runoff-foot">Follow the rounds below.</p></article>
+          </div>
+          <div class="insight" aria-live="polite"><span class="insight-icon" aria-hidden="true">↔</span><div><h3 id="insight-title">Ready to look beyond first choices?</h3><p id="insight-copy">Choose an example or build your own election.</p></div></div>
+
+          <section class="panel rounds-panel" aria-labelledby="rounds-title">
+            <div class="rounds-heading"><div><div class="eyebrow">FOLLOW THE COUNT</div><h3 id="rounds-title">Every round, explained.</h3></div><span id="round-position" class="round-position">ROUND —</span></div>
+            <div class="round-tabs" id="round-tabs" role="group" aria-label="Choose a runoff round"></div>
+            <div class="round-context"><span id="round-description">Your count will appear here.</span><span id="majority" class="majority-pill">Majority: —</span></div>
+            <div id="round-chart" class="round-chart" aria-label="Votes by candidate"></div>
+            <div class="round-legend"><span><i class="legend-line" aria-hidden="true"></i> Majority threshold</span><span id="exhausted">0 exhausted ballots</span></div>
+            <div id="round-explanation" class="round-explanation"></div>
+            <div class="round-controls"><button class="text-button" type="button" id="previous">← Previous round</button><button class="text-button" type="button" id="next">Next round →</button></div>
+          </section>
+        </div>
+      </section>
+    </div>
+    <section class="how-it-works" id="how-it-works" aria-labelledby="how-title"><div><div class="eyebrow">A NOTE ON THE RULES</div><h2 id="how-title">A winner is only<br> part of the story.</h2></div><div class="rule"><span>01 / PLURALITY</span><p>Only first choices count. The candidate with the most votes wins, even without a majority.</p></div><div class="rule"><span>02 / INSTANT-RUNOFF</span><p>If no one has a majority, the lowest candidate is eliminated. Their ballots move to each voter’s next remaining choice. Repeat until there’s a majority.</p><p class="tie-note">A tie for last place pauses the count. If all remaining candidates are tied, the result is a tie. No arbitrary tie-breaks.</p></div></section>
+  </main>
+  <footer><span class="footer-brand">ballotlab <span>Explore the method. Understand the outcome.</span></span><span>Built by Ugochukwu Igweagu · Inspired by CS50</span></footer>
+  <div id="announcement" class="sr-only" role="status" aria-live="polite"></div>
+  <noscript><p class="noscript">Enable JavaScript to use the interactive workspace. The command-line tool works without it.</p></noscript>
+</body>
+</html>
